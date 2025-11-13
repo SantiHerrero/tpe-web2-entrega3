@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/PerfumesModel.php'; // ✅ CORRECCIÓN;
+require_once __DIR__ . '/../models/PerfumesModel.php';
 
 class PerfumesApiController {
     private PerfumeModel $model;
@@ -66,23 +66,40 @@ class PerfumesApiController {
     // Crea un nuevo perfume
     public function create($request, $response) {
         $data = $request->body;
+        
 
-        if (
-            empty($data->id_laboratorio) ||
-            empty($data->precio) ||
-            empty($data->duracion) ||
-            !isset($data->sexo)
-        ) {
-            return $response->json(['error' => 'Faltan campos obligatorios'], 400);
+        // Lista de campos obligatorios y su validación
+        $requiredFields = [
+            'id_laboratorio'       => 'numeric',
+            'precio'         => 'numeric',
+            'duracion'       => 'numeric',
+            'sexo'           => 'numeric'
+        ];
+
+        // Validación con mensaje específico
+        foreach ($requiredFields as $field => $type) {
+            if (!isset($data->$field) || $data->$field === '') {
+                return $response->json(["error" => "Falta el campo obligatorio: $field"], 400);
+            }
+
+            if ($type === 'numeric' && !is_numeric($data->$field)) {
+                return $response->json(["error" => "El campo '$field' debe ser numérico"], 400);
+            }
         }
 
         try {
             $id = $this->model->insert($data);
-            $response->json(['id' => $id, 'message' => 'Perfume creado correctamente'], 201);
+            return $response->json([
+                'id' => $id,
+                'message' => 'Perfume creado correctamente'
+            ], 201);
         } catch (Exception $e) {
-            $response->json(['error' => 'Error al crear el perfume: ' . $e->getMessage()], 500);
+            return $response->json([
+                'error' => 'Error al crear el perfume: ' . $e->getMessage()
+            ], 500);
         }
     }
+
 
     // Actualiza un perfume existente
     public function update($request, $response) {
