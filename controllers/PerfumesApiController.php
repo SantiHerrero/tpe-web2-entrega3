@@ -70,7 +70,7 @@ class PerfumesApiController {
 
         // Lista de campos obligatorios y su validación
         $requiredFields = [
-            'id_laboratorio'       => 'numeric',
+            'id_laboratorio' => 'numeric',
             'precio'         => 'numeric',
             'duracion'       => 'numeric',
             'sexo'           => 'numeric'
